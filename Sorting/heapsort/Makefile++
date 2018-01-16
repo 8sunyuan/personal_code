@@ -1,0 +1,13 @@
+#CFLAGS=-Wall -O2
+CC=g++
+CFLAGS=
+
+all: heapsort
+
+heapsort:
+	${CC} -o $@ heapsort.cpp
+
+clean:
+	rm -f *.o
+	rm -f heapsort 
+
