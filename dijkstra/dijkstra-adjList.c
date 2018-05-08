@@ -1,17 +1,51 @@
 #include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
 #define INFINITY 999999
 #define MAX 10
 
+struct Node {
+    int id;
+    unsigned int cost;
+    struct Node *next;
+} *vertices[MAX];
 
-void dijkstra(int G[MAX][MAX],int n,int root)
+void insert(int i, int id, int cost) {
+    struct Node *x = (struct Node *) malloc(sizeof(struct Node));
+    x->id = id;
+    x->cost = cost;
+    x->next = vertices[i];
+    vertices[i] = x;
+}
+
+void printall(int n) {
+	struct Node *p;
+	for(int i = 0; i < n; i++) {
+        printf("\nNode %d:", i);
+        p = vertices[i];
+        while(p) {
+            printf(" %d", p->id);
+            p = p->next;
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        printf("\nNode Costs %d:", i);
+        p = vertices[i];
+        while(p) {
+            printf(" %d", p->cost);
+            p = p->next;
+        }
+    }
+}
+
+void dijkstra(int n,int root)
 {
     // pred[] stores the predecessor or parent of each node,
     // which is the final solution of the shortest-path tree.
     int pred[MAX];
 
     // Dijkstra algorithm assumes that the graph has non-negative cost on every edge.
-    unsigned int cost[MAX][MAX];
     unsigned int distance[MAX];
     unsigned int minDistance;
 
@@ -20,26 +54,19 @@ void dijkstra(int G[MAX][MAX],int n,int root)
     int nextNode;
     int i,j;
 
-    // create the cost matrix
-    for(i = 0; i < n; i++)
-        for(j = 0; j < n; j++)
-            if(G[i][j]== 0)
-                cost[i][j] = INFINITY;
-            else
-                cost[i][j] = G[i][j];
-
     // initialize pred[],distance[] and visited[]
-    for(i=0;i<n;i++)
-    {
-        distance[i] = cost[root][i];
-        pred[i] = root;
+    for (i = 0; i < n; i++) {
+        distance[i] = INFINITY;
         visited[i] = 0;
+        pred[i] = root;
     }
+    struct Node *p;
+    for (p = vertices[root]; p; p = p->next)
+        distance[p->id] = p->cost;
     distance[root] = 0;
     visited[root] = 1;
     count = 1;
 
-    // count gives the number of nodes seen so far
     while(count < n-1)
     {
         minDistance = INFINITY;
@@ -60,28 +87,26 @@ void dijkstra(int G[MAX][MAX],int n,int root)
         // Now, the new node to add onto the tree is decided,
         // but the position is not determined yet.
         visited[nextNode] = 1;
-
         // For all un-visited nodes, update their "distance" to the root through the "nextNode"
         // to see if a better path exists. Some nodes were not directly connected to the root,
         // their distances were INFINITY; now through the new node, they may have a actual value.
-        for(i = 0; i < n; i++)
+        for (p = vertices[nextNode]; p; p = p->next)
         {
-            if(!visited[i])
+            if(!visited[p->id])
             {
-                if(minDistance + cost[nextNode][i] < distance[i])
+                if(minDistance + p->cost < distance[p->id])
                 {
-                    distance[i] = minDistance + cost[nextNode][i];
+                    distance[p->id] = minDistance + p->cost;
 
                     // the shortest-path tree is growing with one more node
-                    pred[i] = nextNode;
+                    pred[p->id] = nextNode;
                 }
             }
         }
 
         count++;
     }
-
-    // print the shortest-path tree: the path and distance of each node to the root
+    //print the shortest-path tree: the path and distance of each node to the root
     for(i = 0; i < n; i++)
     {
         if(i != root)
@@ -103,19 +128,23 @@ void dijkstra(int G[MAX][MAX],int n,int root)
 // The MAIN
 int main()
 {
-
-    int G[MAX][MAX],i,j,n,u;
+    int i,j,n,u, weight;
     printf("Enter no. of vertices:");
     scanf("%d",&n);
     printf("\nEnter the adjacency matrix:\n");
-
-    for(i=0;i<n;i++)
-        for(j=0;j<n;j++)
-            scanf("%d",&G[i][j]);
-
+    for(i=0;i<n;i++) {
+        vertices[i] = NULL;
+    }
+    for(i=0;i<n;i++) {
+        for(j=0;j<n;j++) {
+            scanf("%d", &weight);
+            // Nonzero weight, insert into adjacency list
+            if (weight) insert(i, j, weight);
+        }
+    }
     printf("\nEnter the starting root node:");
     scanf("%d",&u);
-    dijkstra(G,n,u);
+    dijkstra(n,u);
 
     return 0;
 }
