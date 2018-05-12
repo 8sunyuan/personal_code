@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<time.h>
 
 #define INFINITY 999999
 #define MAX 10
@@ -128,6 +129,9 @@ void dijkstra(int n,int root)
 // The MAIN
 int main()
 {
+    clock_t start_t, end_t, time_t;
+    start_t = clock();
+
     int i,j,n,u, weight;
     printf("Enter no. of vertices:");
     scanf("%d",&n);
@@ -146,5 +150,8 @@ int main()
     scanf("%d",&u);
     dijkstra(n,u);
 
+    end_t = clock();
+    time_t = (double)(end_t - start_t);
+    printf("\n\nCPU finished in %ld\n", time_t);
     return 0;
 }
